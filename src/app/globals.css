@@ -1,0 +1,215 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-public-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-bricolage), var(--font-public-sans), ui-sans-serif, sans-serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+
+  /* Triage palette: status colours carry meaning everywhere they appear. */
+  --color-critical: var(--critical);
+  --color-active: var(--active);
+  --color-recovered: var(--recovered);
+  --color-discharged: var(--discharged);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/*
+ * Palette
+ *   scrub ink  #0F2A3D  text, sidebar
+ *   teal       #0E7C7B  primary actions, the admissions trace
+ *   paper      #F5F8F9  canvas (cool clinical white)
+ *   line       #DAE2E7  hairlines, chart-paper grid
+ */
+:root {
+  --background: #f5f8f9;
+  --foreground: #0f2a3d;
+  --card: #ffffff;
+  --card-foreground: #0f2a3d;
+  --popover: #ffffff;
+  --popover-foreground: #0f2a3d;
+  --primary: #0e7c7b;
+  --primary-foreground: #f5fbfb;
+  --secondary: #e8eff2;
+  --secondary-foreground: #0f2a3d;
+  --muted: #edf2f4;
+  --muted-foreground: #55697a;
+  --accent: #e3f1f0;
+  --accent-foreground: #0b5e5d;
+  --destructive: #c93838;
+  --border: #dae2e7;
+  --input: #cfd9df;
+  --ring: #0e7c7b;
+
+  --critical: #d64545;
+  --active: #2f6fde;
+  --recovered: #2e9d6a;
+  --discharged: #5f6b77;
+
+  --chart-1: #0e7c7b;
+  --chart-2: #2f6fde;
+  --chart-3: #e0a43a;
+  --chart-4: #8a5cd6;
+  --chart-5: #d4697f;
+  --chart-grid: #dfe8ec;
+
+  --radius: 0.625rem;
+
+  --sidebar: #0f2a3d;
+  --sidebar-foreground: #c9d6df;
+  --sidebar-primary: #3cc2bf;
+  --sidebar-primary-foreground: #06201f;
+  --sidebar-accent: #17384f;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #1d4360;
+  --sidebar-ring: #3cc2bf;
+}
+
+.dark {
+  --background: #0a1c29;
+  --foreground: #e3ebf0;
+  --card: #10293b;
+  --card-foreground: #e3ebf0;
+  --popover: #10293b;
+  --popover-foreground: #e3ebf0;
+  --primary: #33b5b2;
+  --primary-foreground: #04201f;
+  --secondary: #173449;
+  --secondary-foreground: #e3ebf0;
+  --muted: #142f43;
+  --muted-foreground: #8fa5b5;
+  --accent: #123b44;
+  --accent-foreground: #9fe3e0;
+  --destructive: #ef6b6b;
+  --border: #1f3e55;
+  --input: #27495f;
+  --ring: #33b5b2;
+
+  --critical: #e25555;
+  --active: #5a8de6;
+  --recovered: #39a874;
+  --discharged: #687582;
+
+  --chart-1: #33b5b2;
+  --chart-2: #6b9bf0;
+  --chart-3: #e8b65a;
+  --chart-4: #a487e6;
+  --chart-5: #e48a9d;
+  --chart-grid: #1b3a50;
+
+  --sidebar: #071623;
+  --sidebar-foreground: #a9bccb;
+  --sidebar-primary: #3cc2bf;
+  --sidebar-primary-foreground: #06201f;
+  --sidebar-accent: #11293b;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #15324a;
+  --sidebar-ring: #3cc2bf;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+    font-feature-settings: "ss01", "cv11";
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-heading;
+    letter-spacing: -0.015em;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+@layer utilities {
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ECG chart paper: fine 8px grid with a heavier rule every 40px. */
+  .chart-paper {
+    background-color: var(--card);
+    background-image:
+      linear-gradient(var(--chart-grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--chart-grid) 1px, transparent 1px),
+      linear-gradient(color-mix(in oklab, var(--chart-grid) 45%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in oklab, var(--chart-grid) 45%, transparent) 1px, transparent 1px);
+    background-size:
+      40px 40px,
+      40px 40px,
+      8px 8px,
+      8px 8px;
+    background-position: -1px -1px;
+  }
+}
+
+/* The admissions trace draws in once when the dashboard loads. */
+@keyframes trace-draw {
+  from {
+    stroke-dashoffset: var(--trace-length, 3000);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.trace-line .recharts-area-curve {
+  stroke-dasharray: var(--trace-length, 3000);
+  animation: trace-draw 1.6s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trace-line .recharts-area-curve {
+    animation: none;
+    stroke-dasharray: none;
+  }
+}

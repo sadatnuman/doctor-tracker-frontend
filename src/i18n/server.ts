@@ -1,5 +1,6 @@
 import "server-only"
 import { notFound } from "next/navigation"
+import { lang } from "next/root-params"
 import { hasLocale, type Locale } from "./config"
 import type { Dictionary } from "./dictionaries/en"
 
@@ -16,6 +17,17 @@ export async function resolveLocale(params: Promise<{ lang: string }>): Promise<
 }
 
 export const getDictionary = (locale: Locale) => dictionaries[locale]()
+
+/**
+ * The locale of the current route, read as a root param. Unlike awaiting `params`,
+ * this never depends on deeper URL segments, so pages with unknown ids can still
+ * prerender their shell.
+ */
+export async function currentLocale(): Promise<Locale> {
+  const value = await lang()
+  if (!hasLocale(value)) notFound()
+  return value
+}
 
 /** `generateMetadata` for private workspace pages: a localized title, never indexed. */
 export function privatePageMetadata(pick: (d: Dictionary) => string) {

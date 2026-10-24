@@ -11,7 +11,7 @@ import type { Dictionary } from "@/i18n/dictionaries/en"
 import { getDictionary, resolveLocale } from "@/i18n/server"
 import { createFormatters } from "@/lib/format"
 import { getFilterOptions, getPublicDoctors } from "@/lib/server-api"
-import { absoluteUrl, alternatesFor, jsonLd, SPECIALTIES } from "@/lib/site"
+import { absoluteUrl, alternatesFor, jsonLd, siteOgImage, SPECIALTIES } from "@/lib/site"
 
 export async function generateMetadata({ params }: PageProps<"/[lang]">): Promise<Metadata> {
   const locale = await resolveLocale(params)
@@ -27,8 +27,9 @@ export async function generateMetadata({ params }: PageProps<"/[lang]">): Promis
       description: d.meta.homeDescription,
       url: absoluteUrl(localePath(locale)),
       locale: OG_LOCALE[locale],
+      images: [siteOgImage(locale, d.meta.ogAlt)],
     },
-    twitter: { card: "summary_large_image", title: d.meta.homeTitle, description: d.meta.homeDescription },
+    twitter: { card: "summary_large_image", title: d.meta.homeTitle, description: d.meta.homeDescription, images: [siteOgImage(locale, d.meta.ogAlt)] },
   }
 }
 

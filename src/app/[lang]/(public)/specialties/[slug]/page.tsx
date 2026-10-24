@@ -11,7 +11,7 @@ import type { Dictionary } from "@/i18n/dictionaries/en"
 import { getDictionary, resolveLocale } from "@/i18n/server"
 import { createFormatters, interpolate } from "@/lib/format"
 import { getFilterOptions, getPublicDoctors } from "@/lib/server-api"
-import { absoluteUrl, alternatesFor, jsonLd, SPECIALTIES, specialtyBySlug } from "@/lib/site"
+import { absoluteUrl, alternatesFor, jsonLd, siteOgImage, SPECIALTIES, specialtyBySlug } from "@/lib/site"
 
 export function generateStaticParams() {
   return SPECIALTIES.map((s) => ({ slug: s.slug }))
@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/specialtie
     title,
     description,
     alternates: alternatesFor(locale, path),
-    openGraph: { title, description, url: absoluteUrl(localePath(locale, path)), locale: OG_LOCALE[locale] },
+    openGraph: { title, description, url: absoluteUrl(localePath(locale, path)), locale: OG_LOCALE[locale], images: [siteOgImage(locale, d.meta.ogAlt)] },
   }
 }
 

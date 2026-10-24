@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,
+  // Fonts read from disk by the link-preview image routes.
+  outputFileTracingIncludes: { "/[lang]/**": ["./assets/fonts/**"] },
   turbopack: {
     rules: {
       "*.css": {

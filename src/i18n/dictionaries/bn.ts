@@ -18,6 +18,7 @@ const bn: Dictionary = {
     loginTitle: "সাইন ইন",
     registerTitle: "রোগীর অ্যাকাউন্ট খুলুন",
     privateTitle: "Doctor Tracker",
+    ogAlt: "Doctor Tracker: বাংলাদেশে অনলাইনে ডাক্তারের অ্যাপয়েন্টমেন্ট নিন",
   },
 
   common: {

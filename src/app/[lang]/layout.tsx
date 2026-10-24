@@ -22,6 +22,8 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
     description: d.meta.homeDescription,
     applicationName: d.meta.siteName,
     formatDetection: { telephone: false },
+    // Large link-preview card everywhere; the image itself comes from opengraph-image.tsx.
+    twitter: { card: "summary_large_image" },
   }
 }
 

@@ -11,6 +11,18 @@ export const SITE_URL = (
 
 export const absoluteUrl = (path: string) => `${SITE_URL}${path}`
 
+/**
+ * The site link-preview image (src/app/[lang]/opengraph-image.tsx). Pages that set their own
+ * `openGraph` replace the inherited one, so they pass this explicitly.
+ */
+export const siteOgImage = (locale: Locale, alt: string) => ({
+  url: localePath(locale, "/opengraph-image"),
+  width: 1200,
+  height: 630,
+  type: "image/png",
+  alt,
+})
+
 /** hreflang alternates for a locale-independent app path ("/doctors"). */
 export function languageAlternates(path: string) {
   return {

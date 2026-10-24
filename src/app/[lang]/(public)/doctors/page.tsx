@@ -9,7 +9,7 @@ import type { Dictionary } from "@/i18n/dictionaries/en"
 import { getDictionary, resolveLocale } from "@/i18n/server"
 import { createFormatters, interpolate } from "@/lib/format"
 import { getFilterOptions, getPublicDoctors } from "@/lib/server-api"
-import { absoluteUrl, alternatesFor, jsonLd, SPECIALTIES } from "@/lib/site"
+import { absoluteUrl, alternatesFor, jsonLd, siteOgImage, SPECIALTIES } from "@/lib/site"
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/doctors">): Promise<Metadata> {
   const locale = await resolveLocale(params)
@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/doctors">)
     description: d.meta.doctorsDescription,
     // Filtered and paginated views all canonicalize to the directory itself.
     alternates: alternatesFor(locale, "/doctors"),
-    openGraph: { title: d.meta.doctorsTitle, description: d.meta.doctorsDescription, url: absoluteUrl(localePath(locale, "/doctors")), locale: OG_LOCALE[locale] },
+    openGraph: { title: d.meta.doctorsTitle, description: d.meta.doctorsDescription, url: absoluteUrl(localePath(locale, "/doctors")), locale: OG_LOCALE[locale], images: [siteOgImage(locale, d.meta.ogAlt)] },
   }
 }
 

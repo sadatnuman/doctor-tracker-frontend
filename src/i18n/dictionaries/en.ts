@@ -20,6 +20,7 @@ const en = {
     loginTitle: "Sign in",
     registerTitle: "Create your patient account",
     privateTitle: "Doctor Tracker",
+    ogAlt: "Doctor Tracker: book a doctor appointment online in Bangladesh",
   },
 
   common: {

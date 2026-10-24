@@ -64,7 +64,6 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/doctors/[i
       description,
       url: absoluteUrl(localePath(locale, path)),
       locale: OG_LOCALE[locale],
-      ...(doctor.avatarUrl && { images: [{ url: absoluteUrl(doctor.avatarUrl), width: 256, height: 256, alt: doctor.name }] }),
     },
   }
 }

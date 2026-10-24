@@ -332,6 +332,15 @@ const bn: Dictionary = {
   },
 
   profile: {
+    photoTitle: "প্রোফাইল ছবি",
+    photoHint: "JPEG, PNG বা WebP। আমরা নিজেরাই ছবিটা বর্গাকারে কেটে নেব।",
+    photoUpload: "ছবি আপলোড করুন",
+    photoChange: "ছবি বদলান",
+    photoRemove: "সরিয়ে দিন",
+    photoSaved: "প্রোফাইল ছবি আপডেট হয়েছে",
+    photoRemoved: "প্রোফাইল ছবি সরানো হয়েছে",
+    photoType: "JPEG, PNG বা WebP ছবি বেছে নিন",
+    email: "ইমেইল",
     title: "প্রোফাইল ও নিরাপত্তা",
     subtitle: "আপনার তথ্য আপডেট করুন আর অ্যাকাউন্ট নিরাপদ রাখুন।",
     details: "আপনার তথ্য",
@@ -345,6 +354,7 @@ const bn: Dictionary = {
     sessionsBody: "অচেনা কোথাও সাইন ইন করা আছে মনে হচ্ছে? এটা সহ সব সেশন বন্ধ করে দিন।",
     signOutEverywhere: "সব জায়গা থেকে সাইন আউট",
     memberSince: "{date} থেকে সদস্য",
+    joined: "যোগ দিয়েছেন",
     role: "রোল",
   },
 

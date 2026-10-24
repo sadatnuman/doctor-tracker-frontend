@@ -240,7 +240,7 @@ async function HeroStats({ locale, d }: { locale: Locale; d: Dictionary }) {
 }
 
 async function FeaturedDoctors({ locale, d }: { locale: Locale; d: Dictionary }) {
-  const result = await getPublicDoctors({ limit: 6, sort: "-consultationFee" })
+  const result = await getPublicDoctors({ limit: 6, sort: "name", page: 2 })
   if (!result) {
     return <p className="mt-8 rounded-xl border bg-card p-6 text-sm text-muted-foreground">{d.directory.unavailableBody}</p>
   }

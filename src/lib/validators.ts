@@ -101,7 +101,8 @@ export const walletPaymentSchema = (v: V) =>
 export type LoginValues = z.infer<ReturnType<typeof loginSchema>>
 export type RegisterFormInput = z.input<ReturnType<typeof registerSchema>>
 export type RegisterValues = z.output<ReturnType<typeof registerSchema>>
-export type ProfileValues = z.infer<ReturnType<typeof profileSchema>>
+export type ProfileFormInput = z.input<ReturnType<typeof profileSchema>>
+export type ProfileValues = z.output<ReturnType<typeof profileSchema>>
 export type ChangePasswordValues = z.infer<ReturnType<typeof changePasswordSchema>>
 export type DoctorFormInput = z.input<ReturnType<typeof doctorSchema>>
 export type DoctorValues = z.output<ReturnType<typeof doctorSchema>>
@@ -109,5 +110,7 @@ export type PatientFormInput = z.input<ReturnType<typeof patientSchema>>
 export type PatientValues = z.output<ReturnType<typeof patientSchema>>
 export type AvailabilityFormInput = z.input<ReturnType<typeof availabilitySchema>>
 export type AvailabilityValues = z.output<ReturnType<typeof availabilitySchema>>
+export type CardPaymentInput = z.input<ReturnType<typeof cardPaymentSchema>>
 export type CardPaymentValues = z.output<ReturnType<typeof cardPaymentSchema>>
+export type WalletPaymentInput = z.input<ReturnType<typeof walletPaymentSchema>>
 export type WalletPaymentValues = z.output<ReturnType<typeof walletPaymentSchema>>

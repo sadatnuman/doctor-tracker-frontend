@@ -334,6 +334,15 @@ const en = {
   },
 
   profile: {
+    photoTitle: "Profile picture",
+    photoHint: "JPEG, PNG or WebP. We crop it to a square for you.",
+    photoUpload: "Upload photo",
+    photoChange: "Change photo",
+    photoRemove: "Remove",
+    photoSaved: "Profile picture updated",
+    photoRemoved: "Profile picture removed",
+    photoType: "Choose a JPEG, PNG or WebP image",
+    email: "Email",
     title: "Profile & security",
     subtitle: "Update your details and keep your account secure.",
     details: "Your details",
@@ -347,6 +356,7 @@ const en = {
     sessionsBody: "Signed in somewhere you don’t recognise? End every session, including this one.",
     signOutEverywhere: "Sign out everywhere",
     memberSince: "Member since {date}",
+    joined: "Joined",
     role: "Role",
   },
 

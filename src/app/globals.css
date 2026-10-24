@@ -7,8 +7,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-public-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-heading: var(--font-bricolage), var(--font-public-sans), ui-sans-serif, sans-serif;
+  /* Inter for Latin text; Noto Sans Bengali supplies the Bangla glyphs Inter lacks. */
+  --font-sans: var(--font-inter), var(--font-bengali), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-inter), var(--font-bengali), ui-sans-serif, sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -44,6 +45,7 @@
   --color-active: var(--active);
   --color-recovered: var(--recovered);
   --color-discharged: var(--discharged);
+  --color-pending: var(--pending);
 
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
@@ -85,6 +87,7 @@
   --active: #2f6fde;
   --recovered: #2e9d6a;
   --discharged: #5f6b77;
+  --pending: #b7791f;
 
   --chart-1: #0e7c7b;
   --chart-2: #2f6fde;
@@ -129,6 +132,7 @@
   --active: #5a8de6;
   --recovered: #39a874;
   --discharged: #687582;
+  --pending: #e0a43a;
 
   --chart-1: #33b5b2;
   --chart-2: #6b9bf0;
@@ -153,7 +157,7 @@
   }
   html {
     @apply font-sans;
-    font-feature-settings: "ss01", "cv11";
+    font-feature-settings: "cv11", "ss03";
   }
   body {
     @apply bg-background text-foreground;

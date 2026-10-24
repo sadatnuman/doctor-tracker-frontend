@@ -3,19 +3,21 @@
 import { Plus } from "lucide-react"
 import { PageHeader } from "@/components/common/page-header"
 import { Button } from "@/components/ui/button"
+import { useI18n } from "@/i18n/client"
 import { PatientList } from "./patient-list"
 
 export function PatientsView() {
+  const { d } = useI18n()
   return (
     <PatientList
       header={(openCreate) => (
         <PageHeader
-          title="Patients"
-          description="Every patient across all doctors. Filter by condition, status or admission date to find a caseload."
+          title={d.admin.patientsTitle}
+          description={d.admin.patientsBody}
           actions={
             <Button onClick={openCreate}>
               <Plus />
-              Add patient
+              {d.admin.addPatient}
             </Button>
           }
         />

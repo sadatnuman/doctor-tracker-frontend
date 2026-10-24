@@ -4,6 +4,7 @@ import { BarChart3, Table2 } from "lucide-react"
 import { useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { useI18n } from "@/i18n/client"
 import { cn } from "@/lib/utils"
 
 export interface TableView {
@@ -23,6 +24,7 @@ interface ChartPanelProps {
 
 /** Chart frame with a "Table" view: identity and values never rely on colour alone. */
 export function ChartPanel({ title, description, table, className, bodyClassName, aside, children }: ChartPanelProps) {
+  const { d, tr } = useI18n()
   const [view, setView] = useState<"chart" | "table">("chart")
 
   return (
@@ -40,10 +42,10 @@ export function ChartPanel({ title, description, table, className, bodyClassName
             variant="outline"
             value={view}
             onValueChange={(v) => v && setView(v as "chart" | "table")}
-            aria-label={`${title} view`}
+            aria-label={tr(d.common.viewOf, { title })}
           >
-            <ToggleGroupItem value="chart" aria-label="Chart view"><BarChart3 /></ToggleGroupItem>
-            <ToggleGroupItem value="table" aria-label="Table view"><Table2 /></ToggleGroupItem>
+            <ToggleGroupItem value="chart" aria-label={d.common.chartView}><BarChart3 /></ToggleGroupItem>
+            <ToggleGroupItem value="table" aria-label={d.common.tableView}><Table2 /></ToggleGroupItem>
           </ToggleGroup>
         </div>
       </header>

@@ -1,38 +1,106 @@
 "use client"
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useRouter } from "next/navigation"
-import { api } from "@/lib/api"
+import { api, ApiError, hasSessionHint } from "@/lib/api"
 import { queryKeys } from "@/lib/query-keys"
-import type { User } from "@/lib/types"
-import type { LoginValues } from "@/lib/validators"
+import type { SessionUser, User } from "@/lib/types"
+import type { ChangePasswordValues, LoginValues, ProfileValues, RegisterValues } from "@/lib/validators"
 
-export function useMe() {
+type SessionResponse = { data: { user: SessionUser; accessToken: string; expiresIn: number } }
+
+/**
+ * The signed-in user, or `null` for visitors. Silent: a 401 here never redirects,
+ * so public pages can ask "who is this?" safely.
+ */
+export function useSession() {
   return useQuery({
     queryKey: queryKeys.me,
-    queryFn: ({ signal }) => api.get<{ data: User }>("/auth/me", undefined, signal).then((r) => r.data),
+    queryFn: async ({ signal }) => {
+      // Visitors without a session never hit the API at all.
+      if (!hasSessionHint()) return null
+      try {
+        return (await api.get<{ data: User }>("/auth/me", undefined, signal, { silent: true })).data
+      } catch (error) {
+        if (error instanceof ApiError && error.status === 401) return null
+        throw error
+      }
+    },
     staleTime: 5 * 60_000,
+    retry: false,
   })
 }
 
-export function useLogin() {
+function useSessionMutation<TVars>(fn: (vars: TVars) => Promise<SessionResponse>) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (values: LoginValues) => api.post<{ data: { user: User } }>("/auth/login", values),
-    meta: { silent: true }, // the form shows the error inline
-    onSuccess: ({ data }) => queryClient.setQueryData(queryKeys.me, data.user),
+    mutationFn: fn,
+    meta: { silent: true }, // forms show errors inline
+    onSuccess: async () => {
+      // Drop any data cached for a previous session, then load the new user.
+      queryClient.removeQueries({ predicate: (q) => q.queryKey[0] !== "auth" })
+      await queryClient.invalidateQueries({ queryKey: queryKeys.me })
+    },
   })
 }
 
-export function useLogout() {
-  const queryClient = useQueryClient()
-  const router = useRouter()
+export const useLogin = () => useSessionMutation((values: LoginValues) => api.post<SessionResponse>("/auth/login", values))
+export const useRegister = () =>
+  useSessionMutation((values: RegisterValues) => api.post<SessionResponse>("/auth/register", values))
+
+/** Full navigation after sign-out: no cached data from the old session survives. */
+function leave(path: string) {
+  window.location.assign(path)
+}
+
+export function useLogout(redirectTo: string) {
   return useMutation({
     mutationFn: () => api.post<void>("/auth/logout"),
-    onSettled: () => {
-      queryClient.clear()
-      router.replace("/login")
-      router.refresh()
+    onSettled: () => leave(redirectTo),
+  })
+}
+
+export function useLogoutEverywhere(redirectTo: string) {
+  return useMutation({
+    mutationFn: () => api.post<void>("/auth/logout-all"),
+    onSuccess: () => leave(redirectTo),
+  })
+}
+
+export function useUpdateProfile() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (values: ProfileValues) => api.patch<{ data: User }>("/auth/me", values).then((r) => r.data),
+    meta: { silent: true },
+    onSuccess: (user) => queryClient.setQueryData(queryKeys.me, user),
+  })
+}
+
+/** Uploads an already-resized image; the new versioned URL busts every cache. */
+export function useUploadAvatar() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (image: Blob) => api.put<{ data: { avatarUrl: string } }>("/auth/me/avatar", image).then((r) => r.data),
+    onSuccess: ({ avatarUrl }) => {
+      queryClient.setQueryData<User | null>(queryKeys.me, (old) => (old ? { ...old, avatarUrl } : old))
+      return queryClient.invalidateQueries({ queryKey: queryKeys.doctors.all })
     },
+  })
+}
+
+export function useRemoveAvatar() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: () => api.delete<{ data: { avatarUrl: null } }>("/auth/me/avatar"),
+    onSuccess: () => {
+      queryClient.setQueryData<User | null>(queryKeys.me, (old) => (old ? { ...old, avatarUrl: null } : old))
+      return queryClient.invalidateQueries({ queryKey: queryKeys.doctors.all })
+    },
+  })
+}
+
+export function useChangePassword() {
+  return useMutation({
+    mutationFn: (values: ChangePasswordValues) => api.post<SessionResponse>("/auth/change-password", values),
+    meta: { silent: true },
   })
 }

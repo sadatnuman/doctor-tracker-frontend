@@ -12,6 +12,8 @@ export const queryKeys = {
     lists: () => ["doctors", "list"] as const,
     list: (params: QueryParams) => ["doctors", "list", params] as const,
     detail: (id: string) => ["doctors", "detail", id] as const,
+    mine: ["doctors", "mine"] as const,
+    myOverview: ["doctors", "mine", "overview"] as const,
     options: (search: string) => ["doctors", "options", search] as const,
   },
 
@@ -20,4 +22,12 @@ export const queryKeys = {
     lists: () => ["patients", "list"] as const,
     list: (params: QueryParams) => ["patients", "list", params] as const,
   },
+
+  appointments: {
+    all: ["appointments"] as const,
+    list: (params: QueryParams) => ["appointments", "list", params] as const,
+    detail: (id: string) => ["appointments", "detail", id] as const,
+  },
+
+  slots: (doctorId: string, from?: string) => ["slots", doctorId, from ?? "today"] as const,
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import { LayoutDashboard, Stethoscope, Users } from "lucide-react"
+import { CalendarCheck, CalendarClock, LayoutDashboard, Stethoscope, Users } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Suspense } from "react"
@@ -18,41 +18,54 @@ import {
   SidebarRail,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { useI18n } from "@/i18n/client"
+import type { Dictionary } from "@/i18n/dictionaries/en"
 import { UserMenu } from "./user-menu"
 
-export const NAV_ITEMS = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/doctors", label: "Doctors", icon: Stethoscope },
-  { href: "/patients", label: "Patients", icon: Users },
-] as const
+export type WorkspaceArea = "admin" | "doctor"
 
-export function isActivePath(pathname: string, href: string) {
-  return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`)
+type NavKey = keyof Dictionary["nav"]
+/** Each workspace's navigation; paths are relative to the locale. */
+const NAV: Record<WorkspaceArea, { path: string; label: NavKey; icon: typeof LayoutDashboard }[]> = {
+  admin: [
+    { path: "/admin", label: "dashboard", icon: LayoutDashboard },
+    { path: "/admin/doctors", label: "doctors", icon: Stethoscope },
+    { path: "/admin/patients", label: "patients", icon: Users },
+    { path: "/admin/appointments", label: "appointments", icon: CalendarCheck },
+  ],
+  doctor: [
+    { path: "/doctor", label: "overview", icon: LayoutDashboard },
+    { path: "/doctor/appointments", label: "appointments", icon: CalendarCheck },
+    { path: "/doctor/patients", label: "myPatients", icon: Users },
+    { path: "/doctor/schedule", label: "schedule", icon: CalendarClock },
+  ],
 }
 
-/** The pathname is request data, so the active state streams in under Suspense. */
-function ActiveNavLinks() {
-  return <NavLinks pathname={usePathname()} />
+/** "/bn/admin" is active only on itself; "/bn/admin/doctors" also on its children. */
+function isActive(pathname: string, href: string, isHome: boolean) {
+  return isHome ? pathname === href : pathname === href || pathname.startsWith(`${href}/`)
 }
 
-function NavLinks({ pathname }: { pathname: string | null }) {
+function NavLinks({ area, pathname }: { area: WorkspaceArea; pathname: string | null }) {
   const { setOpenMobile } = useSidebar()
+  const { d, href } = useI18n()
   return (
     <SidebarMenu className="gap-1">
-      {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
-        const active = pathname !== null && isActivePath(pathname, href)
+      {NAV[area].map(({ path, label, icon: Icon }, i) => {
+        const target = href(path)
+        const active = pathname !== null && isActive(pathname, target, i === 0)
         return (
-          <SidebarMenuItem key={href}>
+          <SidebarMenuItem key={path}>
             <SidebarMenuButton
               asChild
               isActive={active}
-              tooltip={label}
+              tooltip={d.nav[label]}
               size="lg"
               className="h-10 text-[0.9rem] data-[active=true]:bg-sidebar-accent data-[active=true]:font-semibold data-[active=true]:text-white data-[active=true]:shadow-[inset_3px_0_0_var(--sidebar-primary)]"
             >
-              <Link href={href} aria-current={active ? "page" : undefined} onClick={() => setOpenMobile(false)}>
+              <Link href={target} aria-current={active ? "page" : undefined} onClick={() => setOpenMobile(false)}>
                 <Icon className={active ? "text-sidebar-primary" : undefined} />
-                <span>{label}</span>
+                <span>{d.nav[label]}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -62,13 +75,19 @@ function NavLinks({ pathname }: { pathname: string | null }) {
   )
 }
 
-export function AppSidebar() {
+/** The pathname is request data, so the active state streams in under Suspense. */
+function ActiveNavLinks({ area }: { area: WorkspaceArea }) {
+  return <NavLinks area={area} pathname={usePathname()} />
+}
+
+export function AppSidebar({ area }: { area: WorkspaceArea }) {
   const { setOpenMobile } = useSidebar()
+  const { href, d } = useI18n()
 
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="px-3 pt-4 pb-3">
-        <Link href="/" className="flex items-center gap-2.5 text-white" onClick={() => setOpenMobile(false)}>
+        <Link href={href("/")} className="flex items-center gap-2.5 text-white" onClick={() => setOpenMobile(false)}>
           <BrandMark className="size-8" />
           <BrandName className="group-data-[collapsible=icon]:hidden" />
         </Link>
@@ -77,15 +96,17 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
-            <Suspense fallback={<NavLinks pathname={null} />}>
-              <ActiveNavLinks />
-            </Suspense>
+            <nav aria-label={d.nav.mainNav}>
+              <Suspense fallback={<NavLinks area={area} pathname={null} />}>
+                <ActiveNavLinks area={area} />
+              </Suspense>
+            </nav>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
 
       <SidebarFooter className="p-2">
-        <UserMenu />
+        <UserMenu profileHref={href(`/${area}/profile`)} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

@@ -1,4 +1,7 @@
+"use client"
+
 import { Label } from "@/components/ui/label"
+import { useI18n } from "@/i18n/client"
 import { cn } from "@/lib/utils"
 
 interface FormFieldProps {
@@ -13,11 +16,12 @@ interface FormFieldProps {
 
 /** Label + control + error/hint. Pass `aria-invalid` and `aria-describedby={`${id}-message`}` to the control. */
 export function FormField({ id, label, error, hint, optional, className, children }: FormFieldProps) {
+  const { d } = useI18n()
   return (
     <div className={cn("grid gap-1.5", className)}>
       <Label htmlFor={id} className="text-[0.8125rem] font-medium">
         {label}
-        {optional && <span className="font-normal text-muted-foreground">(optional)</span>}
+        {optional && <span className="font-normal text-muted-foreground">{d.common.optional}</span>}
       </Label>
       {children}
       {(error || hint) && (

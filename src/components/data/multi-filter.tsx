@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
+import { useI18n } from "@/i18n/client"
 
 interface MultiFilterProps<T extends string> {
   label: string
@@ -12,14 +13,17 @@ interface MultiFilterProps<T extends string> {
   value: T[]
   onChange: (value: T[]) => void
   renderOption?: (option: T) => React.ReactNode
+  /** Display text for an option (e.g. a translated enum). */
+  getLabel?: (option: T) => string
   className?: string
 }
 
-export function MultiFilter<T extends string>({ label, options, value, onChange, renderOption, className }: MultiFilterProps<T>) {
+export function MultiFilter<T extends string>({ label, options, value, onChange, renderOption, getLabel = (o) => o, className }: MultiFilterProps<T>) {
   const toggle = (option: T) =>
     onChange(value.includes(option) ? value.filter((v) => v !== option) : [...value, option])
 
-  const summary = value.length === 0 ? label : value.length === 1 ? value[0] : `${label}: ${value.length}`
+  const { d } = useI18n()
+  const summary = value.length === 0 ? label : value.length === 1 ? getLabel(value[0]!) : `${label}: ${value.length}`
 
   return (
     <Popover>
@@ -34,14 +38,14 @@ export function MultiFilter<T extends string>({ label, options, value, onChange,
       </PopoverTrigger>
       <PopoverContent className="w-56 p-0" align="start">
         <Command>
-          {options.length > 6 && <CommandInput placeholder={`Find ${label.toLowerCase()}`} />}
+          {options.length > 6 && <CommandInput placeholder={label} />}
           <CommandList>
-            <CommandEmpty>No matches</CommandEmpty>
+            <CommandEmpty>{d.common.noMatches}</CommandEmpty>
             <CommandGroup>
               {options.map((option) => {
                 const checked = value.includes(option)
                 return (
-                  <CommandItem key={option} value={option} onSelect={() => toggle(option)} aria-checked={checked} role="option">
+                  <CommandItem key={option} value={getLabel(option)} onSelect={() => toggle(option)} aria-checked={checked} role="option">
                     <span
                       className={cn(
                         "grid size-4 place-items-center rounded-[4px] border",
@@ -50,7 +54,7 @@ export function MultiFilter<T extends string>({ label, options, value, onChange,
                     >
                       {checked && <Check className="size-3" />}
                     </span>
-                    {renderOption ? renderOption(option) : option}
+                    {renderOption ? renderOption(option) : getLabel(option)}
                   </CommandItem>
                 )
               })}
@@ -60,7 +64,7 @@ export function MultiFilter<T extends string>({ label, options, value, onChange,
                 <CommandSeparator />
                 <CommandGroup>
                   <CommandItem onSelect={() => onChange([])} className="justify-center text-muted-foreground">
-                    Clear selection
+                    {d.common.clearSelection}
                   </CommandItem>
                 </CommandGroup>
               </>

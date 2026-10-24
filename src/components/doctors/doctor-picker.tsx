@@ -7,6 +7,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useDebouncedValue } from "@/hooks/use-debounced-value"
 import { useDoctor, useDoctorOptions } from "@/hooks/use-doctors"
+import { useI18n } from "@/i18n/client"
 import { cn } from "@/lib/utils"
 
 interface DoctorPickerProps {
@@ -23,13 +24,19 @@ interface DoctorPickerProps {
 
 /** Server-searched combobox: scales to any number of doctors, unlike a static <select>. */
 export function DoctorPicker({ value, onChange, selectedName, allowAll, id, invalid, className }: DoctorPickerProps) {
+  const { d, tr } = useI18n()
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState("")
   const debounced = useDebouncedValue(search, 250)
   const options = useDoctorOptions(debounced, open)
   const needsLookup = Boolean(value && !selectedName)
   const selected = useDoctor(needsLookup ? value! : "")
-  const label = value ? (selectedName ?? selected.data?.name ?? "Loading…") : allowAll ? "All doctors" : "Choose a doctor"
+  const label = value
+    ? (selectedName ?? selected.data?.name ?? d.common.loading)
+    : allowAll
+      ? d.admin.allDoctors
+      : d.doctorsAdmin.chooseDoctor
+  const specialty = (s: string) => d.enums.specialization[s] ?? s
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -48,20 +55,26 @@ export function DoctorPicker({ value, onChange, selectedName, allowAll, id, inva
       </PopoverTrigger>
       <PopoverContent className="w-(--radix-popover-trigger-width) min-w-64 p-0" align="start">
         <Command shouldFilter={false}>
-          <CommandInput placeholder="Search doctors by name" value={search} onValueChange={setSearch} />
+          <CommandInput placeholder={d.doctorsAdmin.searchDoctors} value={search} onValueChange={setSearch} />
           <CommandList>
             {options.isFetching && !options.data ? (
               <div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
-                <Loader2 className="size-4 animate-spin" /> Searching…
+                <Loader2 className="size-4 animate-spin" /> {d.doctorsAdmin.searching}
               </div>
             ) : (
-              <CommandEmpty>No doctors match “{debounced}”</CommandEmpty>
+              <CommandEmpty>{tr(d.doctorsAdmin.noDoctorsMatch, { term: debounced })}</CommandEmpty>
             )}
             <CommandGroup>
               {allowAll && !search && (
-                <CommandItem value="__all__" onSelect={() => { onChange(null); setOpen(false) }}>
+                <CommandItem
+                  value="__all__"
+                  onSelect={() => {
+                    onChange(null)
+                    setOpen(false)
+                  }}
+                >
                   <Check className={cn(value ? "opacity-0" : "opacity-100")} />
-                  All doctors
+                  {d.admin.allDoctors}
                 </CommandItem>
               )}
               {options.data?.map((doctor) => (
@@ -76,7 +89,9 @@ export function DoctorPicker({ value, onChange, selectedName, allowAll, id, inva
                   <Check className={cn(value === doctor.id ? "opacity-100" : "opacity-0")} />
                   <div className="min-w-0">
                     <p className="truncate">{doctor.name}</p>
-                    <p className="truncate text-xs text-muted-foreground">{doctor.specialization}, {doctor.hospital}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {specialty(doctor.specialization)}, {doctor.hospital}
+                    </p>
                   </div>
                 </CommandItem>
               ))}

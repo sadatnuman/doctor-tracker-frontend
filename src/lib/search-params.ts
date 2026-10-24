@@ -5,7 +5,7 @@ import {
   parseAsString,
   parseAsStringLiteral,
 } from "nuqs"
-import { CONDITIONS, GENDERS, STATUSES } from "./types"
+import { APPOINTMENT_STATUSES, CONDITIONS, GENDERS, STATUSES } from "./types"
 
 /** List state lives in the URL: shareable, bookmarkable, and back/forward-friendly. */
 
@@ -46,4 +46,14 @@ export type RangePreset = (typeof RANGE_PRESETS)[number]
 
 export const dashboardParams = {
   range: parseAsStringLiteral(RANGE_PRESETS).withDefault("12m"),
+}
+
+export const APPOINTMENT_VIEWS = ["upcoming", "past", "all"] as const
+
+export const appointmentListParams = {
+  page: parseAsInteger.withDefault(1),
+  limit: parseAsInteger.withDefault(10),
+  when: parseAsStringLiteral(APPOINTMENT_VIEWS).withDefault("upcoming"),
+  status: parseAsArrayOf(parseAsStringLiteral(APPOINTMENT_STATUSES)).withDefault([]),
+  doctor: parseAsString,
 }

@@ -4,6 +4,7 @@ import { SlidersHorizontal, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { useI18n } from "@/i18n/client"
 
 interface FilterBarProps {
   search: React.ReactNode
@@ -16,6 +17,7 @@ interface FilterBarProps {
 
 export function FilterBar({ search, filters, activeCount, onClear, trailing }: FilterBarProps) {
   const isMobile = useIsMobile()
+  const { d } = useI18n()
 
   if (isMobile) {
     return (
@@ -23,7 +25,7 @@ export function FilterBar({ search, filters, activeCount, onClear, trailing }: F
         <div className="min-w-0 flex-1">{search}</div>
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="outline" className="h-9 bg-card" aria-label={`Filters${activeCount ? `, ${activeCount} active` : ""}`}>
+            <Button variant="outline" className="h-9 bg-card" aria-label={activeCount ? `${d.common.filters} (${activeCount})` : d.common.filters}>
               <SlidersHorizontal />
               {activeCount > 0 && (
                 <span className="grid size-5 place-items-center rounded-full bg-primary text-[0.7rem] font-semibold text-primary-foreground">
@@ -34,14 +36,14 @@ export function FilterBar({ search, filters, activeCount, onClear, trailing }: F
           </SheetTrigger>
           <SheetContent side="bottom" className="max-h-[85dvh] rounded-t-2xl">
             <SheetHeader>
-              <SheetTitle>Filters</SheetTitle>
-              <SheetDescription>Results update as you choose.</SheetDescription>
+              <SheetTitle>{d.common.filters}</SheetTitle>
+              <SheetDescription>{d.common.resultsUpdate}</SheetDescription>
             </SheetHeader>
             <div className="grid gap-3 overflow-y-auto px-4">{filters}</div>
             <SheetFooter className="flex-row">
               {activeCount > 0 && (
                 <Button variant="outline" className="flex-1" onClick={onClear}>
-                  Clear all
+                  {d.common.clearAll}
                 </Button>
               )}
               {trailing}
@@ -59,7 +61,7 @@ export function FilterBar({ search, filters, activeCount, onClear, trailing }: F
       {activeCount > 0 && (
         <Button variant="ghost" className="h-9 text-muted-foreground" onClick={onClear}>
           <X />
-          Clear filters
+          {d.common.clearFilters}
         </Button>
       )}
       {trailing && <div className="ml-auto">{trailing}</div>}

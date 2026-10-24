@@ -20,17 +20,7 @@ All three accounts sign in on the same page, and each lands in its own area. The
 
 ## Description
 
-Hospitals and clinics keep their rosters of doctors and the hundreds of patients each doctor looks after in spreadsheets. Those spreadsheets can't answer simple questions such as _"who is overloaded?"_ or _"how many critical admissions came in this quarter?"_. Patients, meanwhile, still phone a front desk to find a free slot.
-
-**Doctor Tracker** covers both sides:
-
-- **Patients** browse doctors by specialty without an account and book a time slot. The slot is held for five minutes while they pay, and they keep the receipt.
-- **Doctors** see their day, their bookings and their patient list, and set their own consulting hours.
-- **Administrators** keep the doctor roster and every patient record current, using fast search, filters and pagination over thousands of records. A dashboard turns caseload, conditions, admissions, bookings and revenue into insights.
-
-The whole app works in English and Bangla, and the public pages are built for search engines.
-
-This repository is the **Next.js frontend**. It talks to a standalone Express + MongoDB REST API.
+Hospitals keep their rosters of doctors and the hundreds of patients each doctor looks after in spreadsheets that can't answer simple questions such as _"who is overloaded?"_, while patients still phone a front desk to find a free slot. **Doctor Tracker** gives administrators one secure, sign-in-only portal to keep the doctor roster and every patient record current, with fast search, filters and pagination over thousands of records and a dashboard that turns caseload, conditions, admissions, bookings and revenue into insights. Doctors get their own workspace for their schedule, bookings and patient list, and patients can browse doctors by specialty and book a slot that is held for five minutes while they pay. Everything works in English and Bangla. This repository is the **Next.js frontend**; it talks to a standalone Express + MongoDB REST API.
 
 ## Features
 

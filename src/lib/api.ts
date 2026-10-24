@@ -51,13 +51,16 @@ interface RequestOptions {
   silent?: boolean
 }
 
+const isBlob = (value: unknown): value is Blob => typeof Blob !== "undefined" && value instanceof Blob
+
 async function send(method: string, path: string, options: RequestOptions) {
   try {
     return await fetch(`/api${path}${toSearchParams(options.params)}`, {
       method,
       credentials: "same-origin",
-      headers: options.body !== undefined ? { "Content-Type": "application/json" } : undefined,
-      body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
+      // Blobs (e.g. a profile picture) are sent as raw bytes with their own type.
+      headers: options.body === undefined ? undefined : { "Content-Type": isBlob(options.body) ? options.body.type : "application/json" },
+      body: options.body === undefined ? undefined : isBlob(options.body) ? options.body : JSON.stringify(options.body),
       signal: options.signal,
     })
   } catch (err) {
@@ -92,6 +95,9 @@ function refreshSession(): Promise<boolean> {
   return refreshing
 }
 
+/** Set alongside the httpOnly session cookies; holds no secret, only "a session exists". */
+export const hasSessionHint = () => typeof document !== "undefined" && /(?:^|;\s*)dt_session=/.test(document.cookie)
+
 const NO_REFRESH = ["/auth/login", "/auth/register", "/auth/refresh", "/auth/logout"]
 
 function redirectToSignIn() {
@@ -112,7 +118,7 @@ async function request<T>(method: string, path: string, options: RequestOptions 
   if (!res.ok) {
     const error = payload?.error
     // Access token expired: refresh once, then replay the original request.
-    if (res.status === 401 && !retried && !NO_REFRESH.some((p) => path.startsWith(p))) {
+    if (res.status === 401 && !retried && hasSessionHint() && !NO_REFRESH.some((p) => path.startsWith(p))) {
       if (await refreshSession()) return request<T>(method, path, options, true)
       if (!options.silent) redirectToSignIn()
     }

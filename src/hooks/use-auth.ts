@@ -1,7 +1,7 @@
 "use client"
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { api, ApiError } from "@/lib/api"
+import { api, ApiError, hasSessionHint } from "@/lib/api"
 import { queryKeys } from "@/lib/query-keys"
 import type { SessionUser, User } from "@/lib/types"
 import type { ChangePasswordValues, LoginValues, ProfileValues, RegisterValues } from "@/lib/validators"
@@ -16,6 +16,8 @@ export function useSession() {
   return useQuery({
     queryKey: queryKeys.me,
     queryFn: async ({ signal }) => {
+      // Visitors without a session never hit the API at all.
+      if (!hasSessionHint()) return null
       try {
         return (await api.get<{ data: User }>("/auth/me", undefined, signal, { silent: true })).data
       } catch (error) {
@@ -70,6 +72,29 @@ export function useUpdateProfile() {
     mutationFn: (values: ProfileValues) => api.patch<{ data: User }>("/auth/me", values).then((r) => r.data),
     meta: { silent: true },
     onSuccess: (user) => queryClient.setQueryData(queryKeys.me, user),
+  })
+}
+
+/** Uploads an already-resized image; the new versioned URL busts every cache. */
+export function useUploadAvatar() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (image: Blob) => api.put<{ data: { avatarUrl: string } }>("/auth/me/avatar", image).then((r) => r.data),
+    onSuccess: ({ avatarUrl }) => {
+      queryClient.setQueryData<User | null>(queryKeys.me, (old) => (old ? { ...old, avatarUrl } : old))
+      return queryClient.invalidateQueries({ queryKey: queryKeys.doctors.all })
+    },
+  })
+}
+
+export function useRemoveAvatar() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: () => api.delete<{ data: { avatarUrl: null } }>("/auth/me/avatar"),
+    onSuccess: () => {
+      queryClient.setQueryData<User | null>(queryKeys.me, (old) => (old ? { ...old, avatarUrl: null } : old))
+      return queryClient.invalidateQueries({ queryKey: queryKeys.doctors.all })
+    },
   })
 }
 

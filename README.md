@@ -14,6 +14,8 @@
 
 All three accounts sign in on the same page, and each lands in its own area. The sign-in page also has one-click demo buttons.
 
+> **Access:** the admin portal (`/admin`) and the doctor workspace (`/doctor`) are sign-in only, as the brief requires. The landing page and doctor directory are the public, patient-facing booking site; a patient needs an account only to book.
+
 ![Landing page](docs/screenshots/desktop-landing.png)
 
 ---
@@ -52,6 +54,7 @@ Hospitals keep their rosters of doctors and the hundreds of patients each doctor
   - Per-page titles and descriptions, canonical URLs and `hreflang` (en, bn-BD, x-default).
   - JSON-LD: WebSite with SearchAction, MedicalOrganization, FAQPage, BreadcrumbList and Physician with opening hours.
   - `sitemap.xml` with language alternates, `robots.txt` that keeps private areas out, and one H1 per page.
+  - **Link previews:** a 1200 × 630 thumbnail for every shared link on LinkedIn, Facebook, WhatsApp and X. The site has its own card, and each doctor gets a generated card with name, specialty, hospital, hours and fee.
   - Specialty landing pages for keyword targeting, and internal links through the footer, specialty chips and related doctors.
 - **Profile pictures** for every role. The image is cropped to a square and resized to 256 px WebP in the browser before upload, and it shows on doctor profiles, cards and tables.
 - **Dashboard:**
@@ -120,6 +123,16 @@ See [`.env.example`](./.env.example).
 | `npm run build` | Production build (type-checks and prerenders public pages and static shells) |
 | `npm start` | Serve the production build |
 | `npm run lint` | ESLint (Next.js core-web-vitals + TypeScript rules) |
+| `npm run test:e2e` | Playwright end-to-end tests (needs the API running with demo data; set `E2E_BASE_URL` to test a deployment) |
+
+### End-to-end tests
+
+`npm run test:e2e` runs 17 Playwright tests on desktop and mobile Chrome:
+- Route protection for every role, and a 401 from the API without a session.
+- The full booking journey: visitor picks a slot, signs in, holds it, a declined card keeps the hold, bKash pays, the receipt appears, and cancelling refunds.
+- Locale redirects, Bangla rendering, directory search, canonical and hreflang tags, `robots.txt`, `sitemap.xml` and the link-preview image.
+
+The booking test cancels its appointment at the end, so it can run repeatedly against the demo data.
 
 ### Trying the booking flow
 
@@ -267,6 +280,7 @@ src/
 │  │  └─ layout.tsx              fonts (Inter + Noto Sans Bengali), <html lang>, providers
 │  ├─ sitemap.ts · robots.ts · manifest.ts · icon.svg
 │  └─ globals.css                design tokens (light/dark), chart paper, trace animation
+│  ├─ [lang]/opengraph-image.tsx link-preview card (doctor profiles have their own)
 ├─ proxy.ts                      locale routing + role-based route protection
 ├─ i18n/                         config, typed en/bn dictionaries, server + client helpers
 ├─ components/
@@ -282,6 +296,8 @@ src/
 │  └─ dashboard/                 dashboard view, chart panel, lazy-loaded charts
 ├─ hooks/                        data hooks (auth, doctors, patients, appointments, overview), media hooks
 └─ lib/                          API client, server fetchers, site/SEO helpers, formatters, validators, types
+e2e/                             Playwright tests (access, booking, public site and SEO)
+assets/fonts/                    Inter files for the link-preview images
 ```
 
 ## Deployment
@@ -292,6 +308,11 @@ Deployed on **Vercel** from the `main` branch. In the Vercel project's environme
 - `NEXT_PUBLIC_DEMO_LOGINS`: optional; shows the demo sign-in buttons.
 
 `NEXT_PUBLIC_SITE_URL` only needs to be set when using a custom domain. On the API side, `CLIENT_ORIGIN` must be set to the Vercel URL.
+
+Order matters:
+1. Deploy the API first, and open its `/api/health` once so it's awake. The build prerenders public pages from the API; a sleeping API doesn't break the build, but those pages start empty until they revalidate.
+2. Deploy the frontend, then set the API's `CLIENT_ORIGIN` to the Vercel URL.
+3. Check a shared link with LinkedIn's [Post Inspector](https://www.linkedin.com/post-inspector/). It also refreshes LinkedIn's cached preview after a change.
 
 ## Branching
 

@@ -20,6 +20,7 @@ How the Next.js application is structured and why. Setup and screenshots are in 
 - [16. Responsive design and accessibility](#16-responsive-design-and-accessibility)
 - [17. Error handling and resilience](#17-error-handling-and-resilience)
 - [18. Deployment](#18-deployment)
+- [19. Testing](#19-testing)
 
 ---
 
@@ -105,6 +106,7 @@ Next.js 16 with **Cache Components** (`cacheComponents: true`, Partial Prerender
 | Private pages | `privatePageMetadata()` gives workspace pages a localized title and `noindex, nofollow`. |
 | Keyword targeting | Specialty pages (for example "Cardiology doctors in Bangladesh") have their own copy and doctor lists. Hero search uses a plain GET form, so it works without JavaScript. |
 | Internal links | Footer links to all specialties, specialty chips, breadcrumbs, "Other {specialty} doctors" on each profile, and a featured-doctors grid on the landing page. |
+| Link previews | `[lang]/opengraph-image.tsx` renders a 1200 × 630 site card. `doctors/[id]/opengraph-image.tsx` renders a card per doctor (name, specialty, hospital, hours, fee), built with `next/og` and self-hosted Inter (`assets/fonts`). Pages that set their own `openGraph` pass the site image explicitly (`siteOgImage`), because a child `openGraph` replaces the inherited one. The cards are drawn in English: the renderer can't shape Bengali vowel signs, while the localized title and description still show beside the image. `twitter:card` is `summary_large_image`. |
 | Hosting-ready | `SITE_URL` comes from `NEXT_PUBLIC_SITE_URL`, or Vercel's production URL automatically, so canonical URLs and the sitemap are correct on any free host. |
 
 ## 6. Sessions and route protection
@@ -345,3 +347,16 @@ Tokens are CSS variables in `src/app/globals.css`, exposed to Tailwind through `
   - `Referrer-Policy: strict-origin-when-cross-origin`
   - `poweredByHeader` is disabled.
 - Private areas send `noindex` and are disallowed in `robots.txt`. Public pages are indexable.
+- Deploy the API first and wake it: the build prerenders public pages from it.
+
+## 19. Testing
+
+Playwright end-to-end tests (`npm run test:e2e`, in `e2e/`) run against the real app and API, on desktop and mobile Chrome:
+
+| Spec | Covers |
+|---|---|
+| `access.spec.ts` | Visitors redirected to sign-in from every area. Each role lands in its own area and is bounced out of the others. The API returns 401 without a session. Admin sidebar navigation (the drawer on mobile). |
+| `booking.spec.ts` | Slot selection as a visitor, sign-in with the slot kept, hold and countdown, a declined card keeping the hold, bKash payment, receipt, and cancellation with refund. The test cleans up after itself. |
+| `public.spec.ts` | `/en` and `/bn` rendering with one H1, locale redirects, directory search, canonical and hreflang tags, JSON-LD, `robots.txt`, `sitemap.xml`, and the link-preview image served as PNG. |
+
+The API has its own Vitest + Supertest suite (42 tests) for validation, RBAC, sessions and the booking state machine.

@@ -39,7 +39,7 @@ export function AppointmentDetail() {
           {d.booking.backToAppointments}
         </Link>
       </Button>
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
         <div className="min-w-0">
           {a.status === "pending_payment" && a.holdExpiresAt ? (
             <PendingPayment appointment={a} />
@@ -227,7 +227,7 @@ function CancelButton({ appointment, label }: { appointment: Appointment; label:
 
 function DetailSkeleton() {
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]" aria-busy>
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]" aria-busy>
       <Skeleton className="h-[28rem] rounded-xl" />
       <Skeleton className="h-80 rounded-xl" />
     </div>

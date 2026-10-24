@@ -19,6 +19,6 @@ export function BrandMark({ className }: { className?: string }) {
 
 export function BrandName({ className }: { className?: string }) {
   return (
-    <span className={cn("font-heading text-[1.05rem] font-semibold tracking-tight", className)}>Doctor Tracker</span>
+    <span className={cn("font-heading text-[1.05rem] font-semibold tracking-tight whitespace-nowrap", className)}>Doctor Tracker</span>
   )
 }

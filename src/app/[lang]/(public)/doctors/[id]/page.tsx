@@ -153,12 +153,12 @@ async function Profile({ locale, d, params }: { locale: Locale; d: Dictionary; p
         </ol>
       </nav>
 
-      <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-start">
+      <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-start">
         <div>
           <div className="flex items-start gap-5">
             <UserAvatar name={doctor.name} src={doctor.avatarUrl} tone="teal" className="size-20 rounded-2xl font-heading text-2xl" />
             <div className="min-w-0">
-              <h1 className="text-3xl leading-tight font-semibold sm:text-4xl">{doctor.name}</h1>
+              <h1 className="text-2xl leading-tight font-semibold break-words sm:text-4xl">{doctor.name}</h1>
               {slug ? (
                 <Link href={localePath(locale, `/specialties/${slug}`)} className="mt-1 inline-block font-medium text-primary hover:underline">
                   {specialty}
@@ -184,7 +184,7 @@ async function Profile({ locale, d, params }: { locale: Locale; d: Dictionary; p
           )}
         </div>
 
-        <div className="lg:sticky lg:top-24">
+        <div className="min-w-0 lg:sticky lg:top-24">
           <Suspense fallback={<Skeleton className="h-96 rounded-xl" />}>
             <BookingPanel doctorId={doctor.id} />
           </Suspense>
@@ -232,7 +232,7 @@ async function Related({ locale, d, doctor }: { locale: Locale; d: Dictionary; d
 
 function ProfileSkeleton() {
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_24rem]" aria-busy>
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_24rem]" aria-busy>
       <div>
         <div className="flex items-start gap-5">
           <Skeleton className="size-20 rounded-2xl" />

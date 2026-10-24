@@ -6,8 +6,8 @@
 
 | | |
 |---|---|
-| **Live app** | _added after deployment_ |
-| **Live API** | _added after deployment_ |
+| **Live app** | https://doctor-tracker-gamma-seven.vercel.app |
+| **Live API** | https://doctor-tracker-api-oapp.onrender.com (health check: [`/api/health`](https://doctor-tracker-api-oapp.onrender.com/api/health)) |
 | **Admin** | `admin@doctortracker.com` / `Admin@12345` |
 | **Doctor** | `doctor@doctortracker.com` / `Doctor@12345` (Dr. Ayesha Rahman) |
 | **Patient** | `patient@doctortracker.com` / `Patient@12345` (Rafi Ahmed) |

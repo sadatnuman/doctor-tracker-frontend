@@ -111,7 +111,7 @@ export function RegisterForm() {
 
       <p className="mt-6 text-center text-sm text-muted-foreground">
         {t.haveAccount}{" "}
-        <Link href={`${href("/login")}${next ? `?next=${encodeURIComponent(next)}` : ""}`} className="font-medium text-primary underline-offset-4 hover:underline">
+        <Link prefetch={false} href={`${href("/login")}${next ? `?next=${encodeURIComponent(next)}` : ""}`} className="font-medium text-primary underline-offset-4 hover:underline">
           {d.common.signIn}
         </Link>
       </p>

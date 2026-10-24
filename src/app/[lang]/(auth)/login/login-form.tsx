@@ -96,7 +96,7 @@ export function LoginForm() {
 
       <p className="mt-6 text-center text-sm text-muted-foreground">
         {d.auth.noAccount}{" "}
-        <Link href={`${href("/register")}${next ? `?next=${encodeURIComponent(next)}` : ""}`} className="font-medium text-primary underline-offset-4 hover:underline">
+        <Link prefetch={false} href={`${href("/register")}${next ? `?next=${encodeURIComponent(next)}` : ""}`} className="font-medium text-primary underline-offset-4 hover:underline">
           {d.auth.createAccount}
         </Link>
       </p>

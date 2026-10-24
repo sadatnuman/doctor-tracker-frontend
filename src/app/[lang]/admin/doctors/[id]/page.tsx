@@ -1,8 +1,8 @@
-import type { Metadata } from "next"
 import { Suspense } from "react"
 import { DoctorDetailSkeleton, DoctorDetailView } from "@/components/doctors/doctor-detail-view"
+import { privatePageMetadata } from "@/i18n/server"
 
-export const metadata: Metadata = { title: "Doctor" }
+export const generateMetadata = privatePageMetadata((d) => d.nav.doctors)
 
 export default function DoctorPage() {
   return (

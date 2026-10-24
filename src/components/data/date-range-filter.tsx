@@ -8,8 +8,9 @@ import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { formatUtcDate, localToUtcDate, utcToLocalDate } from "@/lib/format"
+import { localToUtcDate, utcToLocalDate } from "@/lib/format"
 import { cn } from "@/lib/utils"
+import { useI18n } from "@/i18n/client"
 
 export interface UtcRange {
   from: Date | null
@@ -24,14 +25,15 @@ interface DateRangeFilterProps {
 }
 
 const PRESETS = [
-  { label: "Last 7 days", from: () => subDays(new Date(), 6) },
-  { label: "Last 30 days", from: () => subDays(new Date(), 29) },
-  { label: "Last 90 days", from: () => subDays(new Date(), 89) },
-  { label: "This year", from: () => startOfYear(new Date()) },
+  { days: 7, from: () => subDays(new Date(), 6) },
+  { days: 30, from: () => subDays(new Date(), 29) },
+  { days: 90, from: () => subDays(new Date(), 89) },
+  { days: 0, from: () => startOfYear(new Date()) },
 ]
 
 export function DateRangeFilter({ label, value, onChange, className }: DateRangeFilterProps) {
   const isMobile = useIsMobile()
+  const { d, tr, f } = useI18n()
   const [open, setOpen] = useState(false)
   const selected: DateRange | undefined = value.from
     ? { from: utcToLocalDate(value.from), to: value.to ? utcToLocalDate(value.to) : undefined }
@@ -45,8 +47,8 @@ export function DateRangeFilter({ label, value, onChange, className }: DateRange
 
   const summary = value.from
     ? value.to && value.to.getTime() !== value.from.getTime()
-      ? `${formatUtcDate(value.from, "d MMM yy")} – ${formatUtcDate(value.to, "d MMM yy")}`
-      : `From ${formatUtcDate(value.from, "d MMM yy")}`
+      ? `${f.utcDate(value.from)} – ${f.utcDate(value.to)}`
+      : tr(d.dates.from, { date: f.utcDate(value.from) })
     : label
 
   return (
@@ -66,7 +68,7 @@ export function DateRangeFilter({ label, value, onChange, className }: DateRange
             <div className="flex flex-wrap gap-1 border-b p-2 sm:w-36 sm:flex-col sm:border-r sm:border-b-0">
               {PRESETS.map((preset) => (
                 <Button
-                  key={preset.label}
+                  key={preset.days}
                   variant="ghost"
                   size="sm"
                   className="justify-start"
@@ -75,7 +77,7 @@ export function DateRangeFilter({ label, value, onChange, className }: DateRange
                     setOpen(false)
                   }}
                 >
-                  {preset.label}
+                  {preset.days ? tr(d.dates.lastDays, { n: f.number(preset.days) }) : d.dates.thisYear}
                 </Button>
               ))}
             </div>
@@ -95,7 +97,7 @@ export function DateRangeFilter({ label, value, onChange, className }: DateRange
           type="button"
           onClick={() => onChange({ from: null, to: null })}
           className="absolute top-1/2 right-2 grid size-5 -translate-y-1/2 place-items-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"
-          aria-label={`Clear ${label.toLowerCase()}`}
+          aria-label={tr(d.common.clearField, { label })}
         >
           <X className="size-3.5" />
         </button>

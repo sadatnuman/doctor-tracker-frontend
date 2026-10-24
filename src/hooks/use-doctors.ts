@@ -3,8 +3,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { api, type QueryParams } from "@/lib/api"
 import { queryKeys } from "@/lib/query-keys"
-import type { Doctor, DoctorDetail, FilterOptions, Paginated } from "@/lib/types"
-import type { DoctorValues } from "@/lib/validators"
+import type { Doctor, DoctorDetail, DoctorOverview, FilterOptions, Paginated } from "@/lib/types"
+import type { AvailabilityValues, DoctorValues } from "@/lib/validators"
 
 export function useDoctors(params: QueryParams) {
   return useQuery({
@@ -55,10 +55,54 @@ function useInvalidateDoctorData() {
     ])
 }
 
+/** The signed-in doctor's own roster entry (caseload, schedule). */
+export function useMyDoctor() {
+  return useQuery({
+    queryKey: queryKeys.doctors.mine,
+    queryFn: ({ signal }) => api.get<{ data: DoctorDetail }>("/me/doctor", undefined, signal).then((r) => r.data),
+  })
+}
+
+export function useDoctorOverview() {
+  return useQuery({
+    queryKey: queryKeys.doctors.myOverview,
+    queryFn: ({ signal }) => api.get<{ data: DoctorOverview }>("/me/doctor/overview", undefined, signal).then((r) => r.data),
+    staleTime: 30_000,
+  })
+}
+
+/** Doctors edit their own hours; admins edit any doctor's. */
+export function useUpdateAvailability(doctorId?: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (availability: AvailabilityValues) =>
+      (doctorId
+        ? api.patch<{ data: DoctorDetail }>(`/doctors/${doctorId}`, { availability })
+        : api.put<{ data: DoctorDetail }>("/me/doctor/availability", availability)
+      ).then((r) => r.data),
+    onSuccess: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.doctors.all }),
+        queryClient.invalidateQueries({ queryKey: ["slots"] }),
+      ]),
+  })
+}
+
+export function useSetDoctorAccount(doctorId: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (password: string) => api.put<{ data: { email: string } }>(`/doctors/${doctorId}/account`, { password }),
+    meta: { silent: true },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.doctors.all }),
+  })
+}
+
 export function useCreateDoctor() {
   const invalidate = useInvalidateDoctorData()
   return useMutation({
-    mutationFn: (values: DoctorValues) => api.post<{ data: Doctor }>("/doctors", values).then((r) => r.data),
+    // A blank password means "no login yet".
+    mutationFn: ({ password, ...values }: DoctorValues) =>
+      api.post<{ data: Doctor }>("/doctors", password ? { ...values, password } : values).then((r) => r.data),
     meta: { silent: true }, // the form maps errors onto fields
     onSuccess: invalidate,
   })
@@ -68,8 +112,9 @@ export function useUpdateDoctor(id: string) {
   const queryClient = useQueryClient()
   const invalidate = useInvalidateDoctorData()
   return useMutation({
+    // The password field only exists on create.
     mutationFn: (values: Partial<DoctorValues>) =>
-      api.patch<{ data: Doctor }>(`/doctors/${id}`, values).then((r) => r.data),
+      api.patch<{ data: Doctor }>(`/doctors/${id}`, { ...values, password: undefined }).then((r) => r.data),
     meta: { silent: true },
     onSuccess: (doctor) => {
       queryClient.setQueryData<DoctorDetail>(queryKeys.doctors.detail(id), (old) => (old ? { ...old, ...doctor } : old))

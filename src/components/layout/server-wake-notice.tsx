@@ -3,6 +3,7 @@
 import { useIsFetching } from "@tanstack/react-query"
 import { Loader2 } from "lucide-react"
 import { useEffect, useState } from "react"
+import { useI18n } from "@/i18n/client"
 
 /**
  * The API runs on a free tier that sleeps when idle, so the first request can take
@@ -11,6 +12,7 @@ import { useEffect, useState } from "react"
  */
 export function ServerWakeNotice() {
   const fetching = useIsFetching() > 0
+  const { d } = useI18n()
   const [slow, setSlow] = useState(false)
 
   useEffect(() => {
@@ -28,7 +30,8 @@ export function ServerWakeNotice() {
     <p role="status" className="flex items-center gap-2 text-xs text-muted-foreground sm:text-sm">
       <Loader2 className="size-3.5 animate-spin text-primary" />
       <span>
-        Waking the server<span className="hidden sm:inline"> — the first load after a quiet spell can take up to a minute</span>
+        {d.common.wakingServer}
+        <span className="hidden sm:inline">{d.common.wakingServerLong}</span>
       </span>
     </p>
   )

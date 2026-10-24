@@ -11,6 +11,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
+import { useI18n } from "@/i18n/client"
 
 interface ConfirmDialogProps {
   open: boolean
@@ -23,6 +24,7 @@ interface ConfirmDialogProps {
 }
 
 export function ConfirmDialog({ open, onOpenChange, title, description, confirmLabel, pending, onConfirm }: ConfirmDialogProps) {
+  const { d } = useI18n()
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
@@ -33,7 +35,7 @@ export function ConfirmDialog({ open, onOpenChange, title, description, confirmL
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={pending}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={pending}>{d.common.cancel}</AlertDialogCancel>
           {/* A plain Button (not AlertDialogAction) so the dialog stays open while the request runs. */}
           <Button variant="destructive" onClick={onConfirm} disabled={pending} className="bg-destructive text-white hover:bg-destructive/90 dark:bg-destructive">
             {pending && <Loader2 className="animate-spin" />}

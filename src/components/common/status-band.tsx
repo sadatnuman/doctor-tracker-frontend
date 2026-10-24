@@ -1,7 +1,7 @@
 "use client"
 
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import { formatNumber } from "@/lib/format"
+import { useI18n } from "@/i18n/client"
 import { STATUSES, type PatientStatus } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { STATUS_COLOR } from "./status-badge"
@@ -17,14 +17,16 @@ interface StatusBandProps {
  * between segments), always paired with a labelled legend so colour is never the only cue.
  */
 export function StatusBand({ counts, className, size = "sm" }: StatusBandProps) {
+  const { d, f } = useI18n()
   const total = STATUSES.reduce((sum, s) => sum + (counts[s] ?? 0), 0)
   const pct = (n: number) => (total ? Math.round((n / total) * 100) : 0)
+  const label = (s: PatientStatus) => d.enums.status[s]
 
   return (
     <div className={className}>
       <div
         role="img"
-        aria-label={STATUSES.map((s) => `${s} ${counts[s] ?? 0}`).join(", ")}
+        aria-label={STATUSES.map((s) => `${label(s)} ${f.number(counts[s] ?? 0)}`).join(", ")}
         className={cn("flex gap-0.5 overflow-hidden rounded-full bg-muted", size === "lg" ? "h-4" : "h-3")}
       >
         {total > 0 &&
@@ -38,7 +40,7 @@ export function StatusBand({ counts, className, size = "sm" }: StatusBandProps) 
                   />
                 </TooltipTrigger>
                 <TooltipContent>
-                  {status}: {formatNumber(counts[status]!)} ({pct(counts[status]!)}%)
+                  {label(status)}: {f.number(counts[status]!)} ({f.number(pct(counts[status]!))}%)
                 </TooltipContent>
               </Tooltip>
             ) : null
@@ -48,9 +50,9 @@ export function StatusBand({ counts, className, size = "sm" }: StatusBandProps) 
         {STATUSES.map((status) => (
           <li key={status} className="flex items-center gap-1.5">
             <span aria-hidden className="size-2 rounded-full" style={{ backgroundColor: STATUS_COLOR[status] }} />
-            {status}
-            <span className="font-medium text-foreground tabular">{formatNumber(counts[status] ?? 0)}</span>
-            {size === "lg" && <span className="tabular">({pct(counts[status] ?? 0)}%)</span>}
+            {label(status)}
+            <span className="font-medium text-foreground tabular">{f.number(counts[status] ?? 0)}</span>
+            {size === "lg" && <span className="tabular">({f.number(pct(counts[status] ?? 0))}%)</span>}
           </li>
         ))}
       </ul>

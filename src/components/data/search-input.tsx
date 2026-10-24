@@ -4,6 +4,7 @@ import { Search, X } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group"
 import { cn } from "@/lib/utils"
+import { useI18n } from "@/i18n/client"
 
 interface SearchInputProps {
   value: string
@@ -18,6 +19,7 @@ interface SearchInputProps {
  * so typing never triggers a request — or a list re-render — per character.
  */
 export function SearchInput({ value, onChange, placeholder, delay = 300, className }: SearchInputProps) {
+  const { d } = useI18n()
   const [draft, setDraft] = useState(value)
   const [lastValue, setLastValue] = useState(value)
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
@@ -56,7 +58,7 @@ export function SearchInput({ value, onChange, placeholder, delay = 300, classNa
       />
       {draft && (
         <InputGroupAddon align="inline-end">
-          <InputGroupButton size="icon-xs" aria-label="Clear search" onClick={() => update("", true)}>
+          <InputGroupButton size="icon-xs" aria-label={d.common.clearSearch} onClick={() => update("", true)}>
             <X />
           </InputGroupButton>
         </InputGroupAddon>

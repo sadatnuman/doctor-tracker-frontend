@@ -1,8 +1,9 @@
 "use client"
 
-import { ChevronsUpDown, LogOut, Moon, Sun } from "lucide-react"
+import { ChevronsUpDown, Globe, LogOut, Moon, Sun, UserCog } from "lucide-react"
+import Link from "next/link"
 import { useTheme } from "next-themes"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { UserAvatar } from "@/components/common/user-avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,12 +14,13 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useLogout, useMe } from "@/hooks/use-auth"
-import { initials } from "@/lib/format"
+import { useLogout, useSession } from "@/hooks/use-auth"
+import { useI18n } from "@/i18n/client"
 
-export function UserMenu() {
-  const { data: user, isPending } = useMe()
-  const logout = useLogout()
+export function UserMenu({ profileHref }: { profileHref: string }) {
+  const { data: user, isPending } = useSession()
+  const { d, href } = useI18n()
+  const logout = useLogout(href("/login"))
   const { isMobile } = useSidebar()
   const { resolvedTheme, setTheme } = useTheme()
   const dark = resolvedTheme === "dark"
@@ -29,11 +31,7 @@ export function UserMenu() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton size="lg" className="h-12 data-[state=open]:bg-sidebar-accent">
-              <Avatar className="size-8 rounded-lg">
-                <AvatarFallback className="rounded-lg bg-sidebar-primary text-xs font-semibold text-sidebar-primary-foreground">
-                  {user ? initials(user.name) : ""}
-                </AvatarFallback>
-              </Avatar>
+              <UserAvatar name={user?.name ?? ""} src={user?.avatarUrl} tone="sidebar" className="size-8 rounded-lg" />
               <div className="grid flex-1 text-left text-sm leading-tight">
                 {isPending ? (
                   <>
@@ -53,16 +51,29 @@ export function UserMenu() {
           <DropdownMenuContent side={isMobile ? "top" : "right"} align="end" sideOffset={8} className="min-w-56">
             <DropdownMenuLabel className="font-normal">
               <p className="font-medium">{user?.name}</p>
-              <p className="text-xs text-muted-foreground">Administrator</p>
+              <p className="text-xs text-muted-foreground">{user && d.roles[user.role]}</p>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link href={profileHref}>
+                <UserCog />
+                {d.nav.profile}
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href={href("/")}>
+                <Globe />
+                {d.nav.home}
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuItem onSelect={() => setTheme(dark ? "light" : "dark")}>
               {dark ? <Sun /> : <Moon />}
-              {dark ? "Light theme" : "Dark theme"}
+              {dark ? d.common.lightTheme : d.common.darkTheme}
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
             <DropdownMenuItem variant="destructive" disabled={logout.isPending} onSelect={() => logout.mutate()}>
               <LogOut />
-              Sign out
+              {d.common.signOut}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
